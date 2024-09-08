@@ -41,6 +41,43 @@ namespace DG.Tweening
             t.SetTarget(target);
             return t;
         }
+
+         #endregion
+
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
+        #region AudioMixer (Unity 5 or Newer)
+
+        /// <summary>Tweens an AudioMixer's exposed float to the given value.
+        /// Also stores the AudioMixer as the tween's target so it can be used for filtered operations.
+        /// Note that you need to manually expose a float in an AudioMixerGroup in order to be able to tween it from an AudioMixer.</summary>
+        /// <param name="floatName">Name given to the exposed float to set</param>
+        /// <param name="endValue">The end value to reach</param><param name="duration">The duration of the tween</param>
+        public static TweenerCore<float, float, FloatOptions> DOSetFloat(this AudioMixer target, string floatName, float endValue, float duration)
+        {
+            TweenerCore<float, float, FloatOptions> t = DOTween.To(()=> {
+                    float currVal;
+                    target.GetFloat(floatName, out currVal);
+                    return currVal;
+                }, x=> target.SetFloat(floatName, x), endValue, duration);
+            t.SetTarget(target);
+            return t;
+        }
+
+        #region Operation Shortcuts
+
+        /// <summary>
+        /// Completes all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens completed
+        /// (meaning the tweens that don't have infinite loops and were not already complete)
+        /// </summary>
+        /// <param name="withCallbacks">For Sequences only: if TRUE also internal Sequence callbacks will be fired,
+        /// otherwise they will be ignored</param>
+        public static int DOComplete(this AudioMixer target, bool withCallbacks = false)
+        {
+            return DOTween.Complete(target, withCallbacks);
+        }
+
 	/* public static class DOTweenModuleAudio
     {
         #region Shortcuts
