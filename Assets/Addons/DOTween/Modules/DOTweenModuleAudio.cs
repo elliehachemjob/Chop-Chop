@@ -78,6 +78,52 @@ namespace DG.Tweening
             return DOTween.Complete(target, withCallbacks);
         }
 
+
+/// <summary>
+        /// Kills all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens killed.
+        /// </summary>
+        /// <param name="complete">If TRUE completes the tween before killing it</param>
+        public static int DOKill(this AudioMixer target, bool complete = false)
+        {
+            return DOTween.Kill(target, complete);
+        }
+
+        /// <summary>
+        /// Flips the direction (backwards if it was going forward or viceversa) of all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens flipped.
+        /// </summary>
+        public static int DOFlip(this AudioMixer target)
+        {
+            return DOTween.Flip(target);
+        }
+
+        /// <summary>
+        /// Sends to the given position all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens involved.
+        /// </summary>
+        /// <param name="to">Time position to reach
+        /// (if higher than the whole tween duration the tween will simply reach its end)</param>
+        /// <param name="andPlay">If TRUE will play the tween after reaching the given position, otherwise it will pause it</param>
+        public static int DOGoto(this AudioMixer target, float to, bool andPlay = false)
+        {
+            return DOTween.Goto(target, to, andPlay);
+        }
+
+        /// <summary>
+        /// Pauses all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens paused.
+        /// </summary>
+        public static int DOPause(this AudioMixer target)
+        {
+            return DOTween.Pause(target);
+        }
+
+
 	/* public static class DOTweenModuleAudio
     {
         #region Shortcuts
