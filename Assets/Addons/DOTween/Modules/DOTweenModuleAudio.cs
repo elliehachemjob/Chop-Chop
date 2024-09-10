@@ -124,6 +124,87 @@ namespace DG.Tweening
         }
 
 
+
+ /// <summary>
+        /// Plays all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens played.
+        /// </summary>
+        public static int DOPlay(this AudioMixer target)
+        {
+            return DOTween.Play(target);
+        }
+
+        /// <summary>
+        /// Plays backwards all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens played.
+        /// </summary>
+        public static int DOPlayBackwards(this AudioMixer target)
+        {
+            return DOTween.PlayBackwards(target);
+        }
+
+        /// <summary>
+        /// Plays forward all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens played.
+        /// </summary>
+        public static int DOPlayForward(this AudioMixer target)
+        {
+            return DOTween.PlayForward(target);
+        }
+
+        /// <summary>
+        /// Restarts all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens restarted.
+        /// </summary>
+        public static int DORestart(this AudioMixer target)
+        {
+            return DOTween.Restart(target);
+        }
+
+        /// <summary>
+        /// Rewinds all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens rewinded.
+        /// </summary>
+        public static int DORewind(this AudioMixer target)
+        {
+            return DOTween.Rewind(target);
+        }
+
+        /// <summary>
+        /// Smoothly rewinds all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens rewinded.
+        /// </summary>
+        public static int DOSmoothRewind(this AudioMixer target)
+        {
+            return DOTween.SmoothRewind(target);
+        }
+
+        /// <summary>
+        /// Toggles the paused state (plays if it was paused, pauses if it was playing) of all tweens that have this target as a reference
+        /// (meaning tweens that were started from this target, or that had this target added as an Id)
+        /// and returns the total number of tweens involved.
+        /// </summary>
+        public static int DOTogglePause(this AudioMixer target)
+        {
+            return DOTween.TogglePause(target);
+        }
+        #endregion
+
+        #endregion
+#endif
+
+        #endregion
+    }
+} 
+#endif
+
+
 	/* public static class DOTweenModuleAudio
     {
         #region Shortcuts
