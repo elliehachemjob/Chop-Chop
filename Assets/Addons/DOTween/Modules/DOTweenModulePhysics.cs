@@ -13,7 +13,46 @@ using UnityEngine;
 #pragma warning disable 1591
 namespace DG.Tweening
 {
-	public static class DOTweenModulePhysics
+
+    public static class DOTweenModulePhysics
+    {
+        #region Shortcuts
+
+        #region Rigidbody
+
+        /// <summary>Tweens a Rigidbody's position to the given value.
+        /// Also stores the rigidbody as the tween's target so it can be used for filtered operations</summary>
+        /// <param name="endValue">The end value to reach</param><param name="duration">The duration of the tween</param>
+        /// <param name="snapping">If TRUE the tween will smoothly snap all values to integers</param>
+        public static TweenerCore<Vector3, Vector3, VectorOptions> DOMove(this Rigidbody target, Vector3 endValue, float duration, bool snapping = false)
+        {
+            TweenerCore<Vector3, Vector3, VectorOptions> t = DOTween.To(() => target.position, target.MovePosition, endValue, duration);
+            t.SetOptions(snapping).SetTarget(target);
+            return t;
+        }
+
+        /// <summary>Tweens a Rigidbody's X position to the given value.
+        /// Also stores the rigidbody as the tween's target so it can be used for filtered operations</summary>
+        /// <param name="endValue">The end value to reach</param><param name="duration">The duration of the tween</param>
+        /// <param name="snapping">If TRUE the tween will smoothly snap all values to integers</param>
+        public static TweenerCore<Vector3, Vector3, VectorOptions> DOMoveX(this Rigidbody target, float endValue, float duration, bool snapping = false)
+        {
+            TweenerCore<Vector3, Vector3, VectorOptions> t = DOTween.To(() => target.position, target.MovePosition, new Vector3(endValue, 0, 0), duration);
+            t.SetOptions(AxisConstraint.X, snapping).SetTarget(target);
+            return t;
+        }
+
+        /// <summary>Tweens a Rigidbody's Y position to the given value.
+        /// Also stores the rigidbody as the tween's target so it can be used for filtered operations</summary>
+        /// <param name="endValue">The end value to reach</param><param name="duration">The duration of the tween</param>
+        /// <param name="snapping">If TRUE the tween will smoothly snap all values to integers</param>
+        public static TweenerCore<Vector3, Vector3, VectorOptions> DOMoveY(this Rigidbody target, float endValue, float duration, bool snapping = false)
+        {
+            TweenerCore<Vector3, Vector3, VectorOptions> t = DOTween.To(() => target.position, target.MovePosition, new Vector3(0, endValue, 0), duration);
+            t.SetOptions(AxisConstraint.Y, snapping).SetTarget(target);
+            return t;
+        }
+	/* public static class DOTweenModulePhysics
     {
         #region Shortcuts
 
@@ -211,6 +250,6 @@ namespace DG.Tweening
         #endregion
 
         #endregion
-	}
+	}*/
 }
 #endif
