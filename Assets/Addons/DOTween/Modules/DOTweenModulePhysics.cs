@@ -52,6 +52,83 @@ namespace DG.Tweening
             t.SetOptions(AxisConstraint.Y, snapping).SetTarget(target);
             return t;
         }
+
+                /// <summary>Tweens a Rigidbody's Z position to the given value.
+        /// Also stores the rigidbody as the tween's target so it can be used for filtered operations</summary>
+        /// <param name="endValue">The end value to reach</param><param name="duration">The duration of the tween</param>
+        /// <param name="snapping">If TRUE the tween will smoothly snap all values to integers</param>
+        public static TweenerCore<Vector3, Vector3, VectorOptions> DOMoveZ(this Rigidbody target, float endValue, float duration, bool snapping = false)
+        {
+            TweenerCore<Vector3, Vector3, VectorOptions> t = DOTween.To(() => target.position, target.MovePosition, new Vector3(0, 0, endValue), duration);
+            t.SetOptions(AxisConstraint.Z, snapping).SetTarget(target);
+            return t;
+        }
+
+        /// <summary>Tweens a Rigidbody's rotation to the given value.
+        /// Also stores the rigidbody as the tween's target so it can be used for filtered operations</summary>
+        /// <param name="endValue">The end value to reach</param><param name="duration">The duration of the tween</param>
+        /// <param name="mode">Rotation mode</param>
+        public static TweenerCore<Quaternion, Vector3, QuaternionOptions> DORotate(this Rigidbody target, Vector3 endValue, float duration, RotateMode mode = RotateMode.Fast)
+        {
+            TweenerCore<Quaternion, Vector3, QuaternionOptions> t = DOTween.To(() => target.rotation, target.MoveRotation, endValue, duration);
+            t.SetTarget(target);
+            t.plugOptions.rotateMode = mode;
+            return t;
+        }
+
+        /// <summary>Tweens a Rigidbody's rotation so that it will look towards the given position.
+        /// Also stores the rigidbody as the tween's target so it can be used for filtered operations</summary>
+        /// <param name="towards">The position to look at</param><param name="duration">The duration of the tween</param>
+        /// <param name="axisConstraint">Eventual axis constraint for the rotation</param>
+        /// <param name="up">The vector that defines in which direction up is (default: Vector3.up)</param>
+        public static TweenerCore<Quaternion, Vector3, QuaternionOptions> DOLookAt(this Rigidbody target, Vector3 towards, float duration, AxisConstraint axisConstraint = AxisConstraint.None, Vector3? up = null)
+        {
+            TweenerCore<Quaternion, Vector3, QuaternionOptions> t = DOTween.To(() => target.rotation, target.MoveRotation, towards, duration)
+                .SetTarget(target).SetSpecialStartupMode(SpecialStartupMode.SetLookAt);
+            t.plugOptions.axisConstraint = axisConstraint;
+            t.plugOptions.up = (up == null) ? Vector3.up : (Vector3)up;
+            return t;
+        }
+
+        #region Special
+
+        /// <summary>Tweens a Rigidbody's position to the given value, while also applying a jump effect along the Y axis.
+        /// Returns a Sequence instead of a Tweener.
+        /// Also stores the Rigidbody as the tween's target so it can be used for filtered operations</summary>
+        /// <param name="endValue">The end value to reach</param>
+        /// <param name="jumpPower">Power of the jump (the max height of the jump is represented by this plus the final Y offset)</param>
+        /// <param name="numJumps">Total number of jumps</param>
+        /// <param name="duration">The duration of the tween</param>
+        /// <param name="snapping">If TRUE the tween will smoothly snap all values to integers</param>
+        public static Sequence DOJump(this Rigidbody target, Vector3 endValue, float jumpPower, int numJumps, float duration, bool snapping = false)
+        {
+            if (numJumps < 1) numJumps = 1;
+            float startPosY = 0;
+            float offsetY = -1;
+            bool offsetYSet = false;
+            Sequence s = DOTween.Sequence();
+            Tween yTween = DOTween.To(() => target.position, target.MovePosition, new Vector3(0, jumpPower, 0), duration / (numJumps * 2))
+                .SetOptions(AxisConstraint.Y, snapping).SetEase(Ease.OutQuad).SetRelative()
+                .SetLoops(numJumps * 2, LoopType.Yoyo)
+                .OnStart(() => startPosY = target.position.y);
+            s.Append(DOTween.To(() => target.position, target.MovePosition, new Vector3(endValue.x, 0, 0), duration)
+                    .SetOptions(AxisConstraint.X, snapping).SetEase(Ease.Linear)
+                ).Join(DOTween.To(() => target.position, target.MovePosition, new Vector3(0, 0, endValue.z), duration)
+                    .SetOptions(AxisConstraint.Z, snapping).SetEase(Ease.Linear)
+                ).Join(yTween)
+                .SetTarget(target).SetEase(DOTween.defaultEaseType);
+            yTween.OnUpdate(() => {
+                if (!offsetYSet) {
+                    offsetYSet = true;
+                    offsetY = s.isRelative ? endValue.y : endValue.y - startPosY;
+                }
+                Vector3 pos = target.position;
+                pos.y += DOVirtual.EasedValue(0, offsetY, yTween.ElapsedPercentage(), Ease.OutQuad);
+                target.MovePosition(pos);
+            });
+            return s;
+        }
+
 	/* public static class DOTweenModulePhysics
     {
         #region Shortcuts
