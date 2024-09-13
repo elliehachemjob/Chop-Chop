@@ -129,6 +129,89 @@ namespace DG.Tweening
             return s;
         }
 
+    /// <summary>Tweens a Rigidbody's position through the given path waypoints, using the chosen path algorithm.
+        /// Also stores the Rigidbody as the tween's target so it can be used for filtered operations.
+        /// <para>NOTE: to tween a rigidbody correctly it should be set to kinematic at least while being tweened.</para>
+        /// <para>BEWARE: doesn't work on Windows Phone store (waiting for Unity to fix their own bug).
+        /// If you plan to publish there you should use a regular transform.DOPath.</para></summary>
+        /// <param name="path">The waypoints to go through</param>
+        /// <param name="duration">The duration of the tween</param>
+        /// <param name="pathType">The type of path: Linear (straight path), CatmullRom (curved CatmullRom path) or CubicBezier (curved with control points)</param>
+        /// <param name="pathMode">The path mode: 3D, side-scroller 2D, top-down 2D</param>
+        /// <param name="resolution">The resolution of the path (useless in case of Linear paths): higher resolutions make for more detailed curved paths but are more expensive.
+        /// Defaults to 10, but a value of 5 is usually enough if you don't have dramatic long curves between waypoints</param>
+        /// <param name="gizmoColor">The color of the path (shown when gizmos are active in the Play panel and the tween is running)</param>
+        public static TweenerCore<Vector3, Path, PathOptions> DOPath(
+            this Rigidbody target, Vector3[] path, float duration, PathType pathType = PathType.Linear,
+            PathMode pathMode = PathMode.Full3D, int resolution = 10, Color? gizmoColor = null
+        )
+        {
+            if (resolution < 1) resolution = 1;
+            TweenerCore<Vector3, Path, PathOptions> t = DOTween.To(PathPlugin.Get(), () => target.position, target.MovePosition, new Path(pathType, path, resolution, gizmoColor), duration)
+                .SetTarget(target).SetUpdate(UpdateType.Fixed);
+
+            t.plugOptions.isRigidbody = true;
+            t.plugOptions.mode = pathMode;
+            return t;
+        }
+        /// <summary>Tweens a Rigidbody's localPosition through the given path waypoints, using the chosen path algorithm.
+        /// Also stores the Rigidbody as the tween's target so it can be used for filtered operations
+        /// <para>NOTE: to tween a rigidbody correctly it should be set to kinematic at least while being tweened.</para>
+        /// <para>BEWARE: doesn't work on Windows Phone store (waiting for Unity to fix their own bug).
+        /// If you plan to publish there you should use a regular transform.DOLocalPath.</para></summary>
+        /// <param name="path">The waypoint to go through</param>
+        /// <param name="duration">The duration of the tween</param>
+        /// <param name="pathType">The type of path: Linear (straight path), CatmullRom (curved CatmullRom path) or CubicBezier (curved with control points)</param>
+        /// <param name="pathMode">The path mode: 3D, side-scroller 2D, top-down 2D</param>
+        /// <param name="resolution">The resolution of the path: higher resolutions make for more detailed curved paths but are more expensive.
+        /// Defaults to 10, but a value of 5 is usually enough if you don't have dramatic long curves between waypoints</param>
+        /// <param name="gizmoColor">The color of the path (shown when gizmos are active in the Play panel and the tween is running)</param>
+        public static TweenerCore<Vector3, Path, PathOptions> DOLocalPath(
+            this Rigidbody target, Vector3[] path, float duration, PathType pathType = PathType.Linear,
+            PathMode pathMode = PathMode.Full3D, int resolution = 10, Color? gizmoColor = null
+        )
+        {
+            if (resolution < 1) resolution = 1;
+            Transform trans = target.transform;
+            TweenerCore<Vector3, Path, PathOptions> t = DOTween.To(PathPlugin.Get(), () => trans.localPosition, x => target.MovePosition(trans.parent == null ? x : trans.parent.TransformPoint(x)), new Path(pathType, path, resolution, gizmoColor), duration)
+                .SetTarget(target).SetUpdate(UpdateType.Fixed);
+
+            t.plugOptions.isRigidbody = true;
+            t.plugOptions.mode = pathMode;
+            t.plugOptions.useLocalPosition = true;
+            return t;
+        }
+        // Used by path editor when creating the actual tween, so it can pass a pre-compiled path
+        internal static TweenerCore<Vector3, Path, PathOptions> DOPath(
+            this Rigidbody target, Path path, float duration, PathMode pathMode = PathMode.Full3D
+        )
+        {
+            TweenerCore<Vector3, Path, PathOptions> t = DOTween.To(PathPlugin.Get(), () => target.position, target.MovePosition, path, duration)
+                .SetTarget(target);
+
+            t.plugOptions.isRigidbody = true;
+            t.plugOptions.mode = pathMode;
+            return t;
+        }
+        internal static TweenerCore<Vector3, Path, PathOptions> DOLocalPath(
+            this Rigidbody target, Path path, float duration, PathMode pathMode = PathMode.Full3D
+        )
+        {
+            Transform trans = target.transform;
+            TweenerCore<Vector3, Path, PathOptions> t = DOTween.To(PathPlugin.Get(), () => trans.localPosition, x => target.MovePosition(trans.parent == null ? x : trans.parent.TransformPoint(x)), path, duration)
+                .SetTarget(target);
+
+            t.plugOptions.isRigidbody = true;
+            t.plugOptions.mode = pathMode;
+            t.plugOptions.useLocalPosition = true;
+            return t;
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
 	/* public static class DOTweenModulePhysics
     {
         #region Shortcuts
